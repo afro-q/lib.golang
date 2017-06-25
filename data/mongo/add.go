@@ -18,6 +18,6 @@ func (mi *MongoInterface) Add(parameters dataGlobals.AddParameters) (result.Resu
 	if addError := collection.Insert(addParameters); addError != nil {
 		return dataGlobals.GetOperationError(addError.Error()), ""
 	} else {
-		return result.GetSuccessResult(), addParameters["_id"].(bson.ObjectId).String()
+		return result.GetSuccessResult(), BsonIdToString(addParameters["_id"].(bson.ObjectId))
 	}
 }
