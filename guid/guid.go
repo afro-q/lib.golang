@@ -7,8 +7,5 @@ import (
 )
 
 func NewGuid() string {
-	var newGuid string
-	fmt.Sprintf(newGuid, uuid.NewV4())
-	
-	return newGuid
+	return fmt.Sprintf("%v", uuid.NewV4())	
 }
