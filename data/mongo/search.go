@@ -1,6 +1,7 @@
 package mongo
 
 import (
+	mgo "gopkg.in/mgo.v2"
 	bson "gopkg.in/mgo.v2/bson"
 	
 	"github.com/quinlanmorake/lib.golang/result"
@@ -9,13 +10,20 @@ import (
 
 func (mi *MongoInterface) Search(parameters dataGlobals.SearchParameters) (result.Result, *dataGlobals.Rows) {
 	mongoFilterParameters := parameters.ToBsonMap()
+	sortParameters := parameters.GetSortFields()
 	
 	searchSession := mi.MongoSession.Copy()
 	defer searchSession.Close()
 
 	collection := searchSession.DB(mi.DbName).C(string(parameters.Table))
-	rowIterator := collection.Find(mongoFilterParameters).Iter()
+	var rowIterator *mgo.Iter
 
+	if len(sortParameters) > 0 {
+		rowIterator = collection.Find(mongoFilterParameters).Sort(sortParameters...).Skip(parameters.StartIndex).Limit(parameters.MaxRows).Iter()
+	} else {
+		rowIterator = collection.Find(mongoFilterParameters).Iter()
+	}
+	
 	var queryResultEntry interface{}
 	rowsFound := dataGlobals.Rows{}
 	for rowIterator.Next(&queryResultEntry) {
