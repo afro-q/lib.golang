@@ -35,8 +35,8 @@ func (dfa DbFieldArray) ToBsonMap() bson.M {
 	mapObject := make(map[string]interface{}, len(dfa))
 
 	for _, field := range dfa {
-		if (field.Name == "_id") {
-			mapObject[field.Name] = bson.ObjectIdHex(field.Value.(string))
+		if (field.Type == DbField_Id) && bson.IsObjectIdHex(field.Value.(string)) {
+				mapObject[field.Name] = bson.ObjectIdHex(field.Value.(string))
 		} else {
 			mapObject[field.Name] = field.Value
 		} 
