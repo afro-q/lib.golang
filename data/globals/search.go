@@ -9,7 +9,7 @@ import (
 type SearchParameters struct {
 	Table Tablename
 	SearchFields DbFieldArray
-	SortFields DbFieldArray
+	SortFields DbSortFieldArray
 	StartIndex int
 	MaxRows int
 }
@@ -22,14 +22,3 @@ type ISearchImplementor interface {
 func (s SearchParameters) ToBsonMap() bson.M {
 	return s.SearchFields.ToBsonMap()
 }
-
-func (s SearchParameters) GetSortFields() []string {
-	sortFields := make([]string, len(s.SortFields))
-
-	for index, _ := range s.SortFields {
-		sortFields[index] = s.SortFields[index].Name
-	}
-
-	return sortFields
-}
-

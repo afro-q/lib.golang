@@ -10,7 +10,6 @@ import (
 
 func (mi *MongoInterface) Search(parameters dataGlobals.SearchParameters) (result.Result, *dataGlobals.Rows) {
 	mongoFilterParameters := parameters.ToBsonMap()
-	sortParameters := parameters.GetSortFields()
 	
 	searchSession := mi.MongoSession.Copy()
 	defer searchSession.Close()
@@ -18,8 +17,18 @@ func (mi *MongoInterface) Search(parameters dataGlobals.SearchParameters) (resul
 	collection := searchSession.DB(mi.DbName).C(string(parameters.Table))
 	var rowIterator *mgo.Iter
 
-	if len(sortParameters) > 0 {
-		rowIterator = collection.Find(mongoFilterParameters).Sort(sortParameters...).Skip(parameters.StartIndex).Limit(parameters.MaxRows).Iter()
+	if len(parameters.SortFields) > 0 {
+		fieldsToSortBy := make([]string, len(parameters.SortFields))
+
+		for index, _ := range parameters.SortFields {
+			if parameters.SortFields[index].Ascending {
+				fieldsToSortBy[index] = parameters.SortFields[index].Name
+			} else {
+				fieldsToSortBy[index] = "-" + parameters.SortFields[index].Name
+			}
+		}
+		
+		rowIterator = collection.Find(mongoFilterParameters).Sort(fieldsToSortBy...).Skip(parameters.StartIndex).Limit(parameters.MaxRows).Iter()
 	} else {
 		rowIterator = collection.Find(mongoFilterParameters).Iter()
 	}

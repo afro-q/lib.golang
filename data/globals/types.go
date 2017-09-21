@@ -31,6 +31,11 @@ type Field struct {
 	Value interface{}
 }
 
+type SortField struct {
+	Name string
+	Ascending bool
+}
+
 type DbFieldArray []Field
 
 func (dfa DbFieldArray) ToBsonMap() bson.M {
@@ -46,3 +51,5 @@ func (dfa DbFieldArray) ToBsonMap() bson.M {
 
 	return mapObject
 }
+
+type DbSortFieldArray []SortField
