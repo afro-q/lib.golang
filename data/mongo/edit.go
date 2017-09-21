@@ -13,6 +13,7 @@ func (mi *MongoInterface) Edit(parameters dataGlobals.EditParameters) result.Res
 	collection := dbSession.DB(mi.DbName).C(string(parameters.Table))
 
 	filterParameters := parameters.FilterFields.ToBsonMap()
+
 	fieldsToUpdate := map[string]interface{} {
 		"$set": parameters.FieldsToUpdate.ToBsonMap(),
 	}

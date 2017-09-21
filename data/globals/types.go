@@ -21,6 +21,8 @@ const (
   DbField_VarChar
 	DbField_Int
 	DbField_Blob
+	DbField_Object
+	DbField_Array
 )
 
 type Field struct {
@@ -35,7 +37,7 @@ func (dfa DbFieldArray) ToBsonMap() bson.M {
 	mapObject := make(map[string]interface{}, len(dfa))
 
 	for _, field := range dfa {
-		if (field.Name == "_id") {
+		if (field.Type == DbField_Id) {
 			mapObject[field.Name] = bson.ObjectIdHex(field.Value.(string))
 		} else {
 			mapObject[field.Name] = field.Value

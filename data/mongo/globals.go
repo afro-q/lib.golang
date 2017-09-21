@@ -1,10 +1,18 @@
 package mongo
 
 import (
+	"strings"
+	
 	bson "gopkg.in/mgo.v2/bson"
 
 	dataGlobals "github.com/quinlanmorake/lib.golang/data/globals"
 )
+
+func BsonIdToString(bsonId bson.ObjectId) string {
+	tempStr := strings.Replace(bsonId.String(), "ObjectIdHex(", "", -1)
+	tempStr = strings.Replace(tempStr, ")", "", -1)
+	return tempStr
+}
 
 func GetField(mongoDbObjectPropertyName string, mongoDbObjectPropertyValue interface{}) (dbField dataGlobals.Field) {
 	dbField = dataGlobals.Field{
