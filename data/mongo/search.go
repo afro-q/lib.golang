@@ -1,7 +1,7 @@
 package mongo
 
 import (
-	mgo "gopkg.in/mgo.v2"
+	//mgo "gopkg.in/mgo.v2"
 	bson "gopkg.in/mgo.v2/bson"
 	
 	"github.com/quinlanmorake/lib.golang/result"
@@ -15,8 +15,8 @@ func (mi *MongoInterface) Search(parameters dataGlobals.SearchParameters) (resul
 	defer searchSession.Close()
 
 	collection := searchSession.DB(mi.DbName).C(string(parameters.Table))
-	var rowIterator *mgo.Iter
 
+	var mongoQuery = collection.Find(mongoFilterParameters)	
 	if len(parameters.SortFields) > 0 {
 		fieldsToSortBy := make([]string, len(parameters.SortFields))
 
@@ -27,11 +27,19 @@ func (mi *MongoInterface) Search(parameters dataGlobals.SearchParameters) (resul
 				fieldsToSortBy[index] = "-" + parameters.SortFields[index].Name
 			}
 		}
-		
-		rowIterator = collection.Find(mongoFilterParameters).Sort(fieldsToSortBy...).Skip(parameters.StartIndex).Limit(parameters.MaxRows).Iter()
-	} else {
-		rowIterator = collection.Find(mongoFilterParameters).Iter()
+
+		mongoQuery = mongoQuery.Sort(fieldsToSortBy...)
+	} 
+
+	if parameters.StartIndex > 0 {
+		mongoQuery = mongoQuery.Skip(parameters.StartIndex)
 	}
+
+	if parameters.MaxRows > 0 {
+		mongoQuery = mongoQuery.Limit(parameters.MaxRows)
+	}
+
+	rowIterator := mongoQuery.Iter()
 	
 	var queryResultEntry interface{}
 	rowsFound := dataGlobals.Rows{}
